@@ -122,12 +122,12 @@ export default function PrivacyPage() {
           <br />
           Website:{" "}
           <a
-            href="https://github.com/saxenamayankai/open-screens"
+            href="https://github.com/saxenamayank92/open-screens"
             style={{ color: "#c5a059", textDecoration: "underline" }}
             target="_blank"
             rel="noopener noreferrer"
           >
-            github.com/saxenamayankai/open-screens
+            github.com/saxenamayank92/open-screens
           </a>
         </p>
       </section>

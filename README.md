@@ -66,7 +66,7 @@ Commercial digital signage platforms (Rise Vision, Raydiant, Yodeck) charge **$3
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/saxenamayankai/open-screens.git
+git clone https://github.com/saxenamayank92/open-screens.git
 cd open-screens
 npm ci
 ```
@@ -144,4 +144,4 @@ cd android && ./gradlew testLocalDebugUnitTest
 
 ## 📄 License
 
-OpenScreens is licensed under the [MIT License](LICENSE). Built and maintained by [Mayank Saxena](https://github.com/saxenamayankai) / [xTide Apps](https://www.xtideapps.com).
+OpenScreens is licensed under the [MIT License](LICENSE). Built and maintained by [Mayank Saxena](https://github.com/saxenamayank92) / [xTide Apps](https://www.xtideapps.com).
