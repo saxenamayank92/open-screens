@@ -1,0 +1,28 @@
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/cormorant.woff2") format("woff2");
+  font-weight: 300 700;
+  font-display: block;
+}
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/jakarta.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: block;
+}
+:root {
+  --navy: #122046;
+  --navy-deep: #070d1e;
+  --gold: #c5a880;
+  --gold-dark: #987a50;
+  --cream: #faf8f5;
+  --muted: #f2eee7;
+  --ink: #0a1122;
+  --body: #3c4858;
+  --line: #dedbd4;
+  --radius: 4px;
+  --shadow: 0 8px 24px #0c163008;
+  --serif: "Cormorant Garamond", Georgia, serif;
+  --sans: "Plus Jakarta Sans", Arial, sans-serif;
+  --space: 8px;
+}

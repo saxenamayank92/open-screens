@@ -1,0 +1,52 @@
+{
+  "name": "open-screens",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 3100",
+    "build": "npm run renderer:build && next build",
+    "start": "next start -p 3100",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "admin:bootstrap": "tsx scripts/bootstrap.ts",
+    "renderer:build": "vite build --config renderer.vite.config.ts && rm -f android/app/src/main/assets/renderer/tv.apk"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1000.0",
+    "@aws-sdk/s3-request-presigner": "^3.1000.0",
+    "@js-temporal/polyfill": "^0.5.1",
+    "@vercel/functions": "3.9.9",
+    "bcryptjs": "^3.0.3",
+    "drizzle-orm": "^0.45.2",
+    "konva": "^10.2.0",
+    "lucide-react": "^0.577.0",
+    "next": "16.3.5",
+    "pg": "^8.16.3",
+    "qrcode": "^1.5.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-konva": "19.3.0",
+    "sharp": "^0.35.4",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@neon/config": "^1.7.2",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^22.19.0",
+    "@types/pg": "^8.15.6",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.1.4",
+    "dotenv": "^17.2.3",
+    "prettier": "^3.9.8",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.17"
+  },
+  "type": "module"
+}
