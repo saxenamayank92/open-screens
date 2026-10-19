@@ -196,3 +196,23 @@ test("unsupported renderer version preserves last valid scene", async ({
     ),
   ).toBe(false);
 });
+test("packaged renderer shows when content was last updated only after the device goes stale", async ({
+  page,
+}) => {
+  await page.evaluate((m) => (window as any).receiveManifest(m), fixture());
+  const badge = page.getByTestId("offline-badge");
+  await page.evaluate(() =>
+    (window as any).receiveSyncStatus({ lastSyncAt: Date.now() }),
+  );
+  await expect(badge).toHaveCount(0);
+  await page.evaluate(() =>
+    (window as any).receiveSyncStatus({
+      lastSyncAt: Date.now() - 10 * 60 * 1000,
+    }),
+  );
+  await expect(badge).toContainText("Offline · last updated");
+  await page.evaluate(() =>
+    (window as any).receiveSyncStatus({ lastSyncAt: Date.now() }),
+  );
+  await expect(badge).toHaveCount(0);
+});

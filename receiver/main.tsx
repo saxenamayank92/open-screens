@@ -6,6 +6,7 @@ import "../src/shared/brand.css";
 declare global {
   interface Window {
     receiveManifest?: (m: Manifest) => void;
+    receiveSyncStatus?: (s: { lastSyncAt: number }) => void;
     Screens?: { postMessage: (text: string) => void };
   }
 }
@@ -27,6 +28,7 @@ const fallback: Manifest = {
 };
 function Receiver() {
   const [manifest, setManifest] = React.useState(fallback);
+  const [lastSyncAt, setLastSyncAt] = React.useState<number | undefined>();
   React.useEffect(() => {
     const timer = setInterval(
       () =>
@@ -50,14 +52,17 @@ function Receiver() {
       }
       setManifest(m);
     };
+    window.receiveSyncStatus = (s) => setLastSyncAt(s.lastSyncAt);
     window.Screens?.postMessage(JSON.stringify({ type: "ready" }));
     return () => {
       delete window.receiveManifest;
+      delete window.receiveSyncStatus;
     };
   }, []);
   return (
     <DisplayPlayer
       manifest={manifest}
+      lastSyncAt={lastSyncAt}
       onRender={(slideId) =>
         window.Screens?.postMessage(
           JSON.stringify({

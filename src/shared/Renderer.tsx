@@ -379,14 +379,82 @@ export function CanvasRenderer({
     </div>
   );
 }
+// A TV that hasn't reached the server for this long shows when its content was last updated.
+export const STALE_AFTER_MS = 2 * 60 * 1000;
+
+export function lastUpdatedLabel(lastSyncAt: number, now: Date = new Date()) {
+  const at = new Date(lastSyncAt);
+  const time = at.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  return at.toDateString() === now.toDateString()
+    ? time
+    : at.toLocaleDateString(undefined, { month: "short", day: "numeric" }) +
+        ", " +
+        time;
+}
+
+function OfflineBadge({
+  lastSyncAt,
+  height,
+}: {
+  lastSyncAt: number;
+  height: number;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 10000);
+    return () => clearInterval(timer);
+  }, []);
+  if (now - lastSyncAt < STALE_AFTER_MS) return null;
+  const size = Math.max(12, Math.round(height * 0.018));
+  return (
+    <div
+      data-testid="offline-badge"
+      style={{
+        position: "absolute",
+        right: "2.5%",
+        bottom: "2.5%",
+        zIndex: 10,
+        display: "flex",
+        alignItems: "center",
+        gap: size * 0.5,
+        padding: `${size * 0.45}px ${size * 0.9}px`,
+        borderRadius: 999,
+        background: "rgba(7, 13, 30, 0.72)",
+        color: "rgba(255, 255, 255, 0.85)",
+        fontFamily: "system-ui, sans-serif",
+        fontSize: size,
+        lineHeight: 1,
+      }}
+    >
+      <span
+        style={{
+          width: size * 0.55,
+          height: size * 0.55,
+          borderRadius: "50%",
+          background: "#f2b33d",
+        }}
+      />
+      {lastSyncAt > 0
+        ? "Offline · last updated " + lastUpdatedLabel(lastSyncAt, new Date(now))
+        : "Offline · waiting for first update"}
+    </div>
+  );
+}
+
 export function DisplayPlayer({
   manifest: m,
   assets,
+  lastSyncAt,
   onRender,
   onError,
 }: {
   manifest: Manifest;
   assets?: Record<string, string>;
+  /** Epoch ms of the device's last successful sync; 0 if it has never synced. Omit to hide the badge. */
+  lastSyncAt?: number;
   onRender?: (slideId: string) => void;
   onError?: (message: string) => void;
 }) {
@@ -507,6 +575,9 @@ export function DisplayPlayer({
             document={fallbackDocument}
             width={Math.min(transform.width, (transform.height * 1080) / 1920)}
           />
+        )}
+        {lastSyncAt !== undefined && (
+          <OfflineBadge lastSyncAt={lastSyncAt} height={transform.height} />
         )}
       </div>
     </div>

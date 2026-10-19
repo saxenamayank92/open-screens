@@ -2,6 +2,7 @@ package io.openscreens.app
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -65,6 +66,10 @@ class MainActivity : Activity() {
     @Volatile private var lastError = ""
     private var lastAck = ""
     @Volatile private var pendingAck: JSONObject? = null
+    private lateinit var syncState: SharedPreferences
+    @Volatile private var lastSyncAt = 0L
+    private var lastSyncSaved = 0L
+    private var lastSyncPushed = 0L
     private val watchdog =
         object : Runnable {
             override fun run() {
@@ -98,6 +103,8 @@ class MainActivity : Activity() {
         credentials = Credentials(this)
         mediaDir = File(filesDir, "media").apply { mkdirs() }
         manifestFile = AtomicFile(File(filesDir, "assignment.json"))
+        syncState = getSharedPreferences("sync", MODE_PRIVATE)
+        lastSyncAt = syncState.getLong("lastSyncAt", 0L)
         paired = credentials.get("paired") == "true"
         active =
             try {
@@ -268,6 +275,7 @@ class MainActivity : Activity() {
                             "ready" -> {
                                 renderReady = true
                                 pushManifest()
+                                pushSyncStatus()
                             }
                             "render" -> {
                                 val current = staged ?: active
@@ -348,6 +356,16 @@ class MainActivity : Activity() {
             }
     }
 
+    private fun pushSyncStatus() {
+        if (renderReady)
+            main.post {
+                web?.evaluateJavascript(
+                    "window.receiveSyncStatus && window.receiveSyncStatus({lastSyncAt: $lastSyncAt});",
+                    null,
+                )
+            }
+    }
+
     private fun showMessage(message: String) {
         main.post {
             setContentView(
@@ -400,6 +418,15 @@ class MainActivity : Activity() {
             return
         }
         if (status != 200) throw Exception("Synchronization failed")
+        lastSyncAt = now
+        if (now - lastSyncSaved >= 60000) {
+            syncState.edit().putLong("lastSyncAt", now).apply()
+            lastSyncSaved = now
+        }
+        if (now - lastSyncPushed >= 30000) {
+            lastSyncPushed = now
+            pushSyncStatus()
+        }
         if (credentials.get("resetPinHash") == null) {
             val (cs, cb) = request("config")
             if (cs == 200) credentials.set("resetPinHash", JSONObject(cb).getString("resetPinHash"))
@@ -565,6 +592,8 @@ class MainActivity : Activity() {
         staged = null
         credentials.clear()
         manifestFile.delete()
+        syncState.edit().clear().apply()
+        lastSyncAt = 0L
         mediaDir.listFiles()?.forEach { it.delete() }
         codeExpires = 0
         pairingCode = ""
